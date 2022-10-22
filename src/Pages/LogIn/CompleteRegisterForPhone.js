@@ -1,14 +1,17 @@
+import axios from 'axios';
 import { EmailAuthProvider, linkWithCredential, updateEmail } from 'firebase/auth';
 import React from 'react';
-import { useUpdateProfile } from 'react-firebase-hooks/auth';
+import { useAuthState, useUpdateProfile } from 'react-firebase-hooks/auth';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import auth from '../../firebase.init';
 
 const CompleteRegisterForPhone = () => {
 
     const { register, formState: { errors }, handleSubmit } = useForm();
     const [updateProfile, updating, updateError] = useUpdateProfile(auth);
+
     // const credential = EmailAuthProvider.credential(data.email, data.password);
     const navigate = useNavigate();
 
@@ -40,6 +43,7 @@ const CompleteRegisterForPhone = () => {
         // });
         console.log('update done');
         navigate('/')
+
 
 
     }

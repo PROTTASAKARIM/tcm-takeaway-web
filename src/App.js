@@ -25,6 +25,9 @@ import RequireAuth from './Pages/LogIn/RequireAuth';
 import RegisterNew from './Pages/LogIn/RegisterNew';
 import CompleteRegisterForEmail from './Pages/LogIn/CompleteRegisterForEmail';
 import CompleteRegisterForPhone from './Pages/LogIn/CompleteRegisterForPhone';
+import RegisterNewUpdated from './Pages/LogIn/RegisterNewUpdated';
+import LoginNewUpdated from './Pages/LogIn/LoginNewUpdated';
+import GiveName from './Pages/LogIn/GiveName';
 
 
 
@@ -66,11 +69,12 @@ function App() {
           <Route path='/privacypolicy' element={<PrivacyPolicy></PrivacyPolicy>}></Route>
           <Route path='/returnpolicy' element={<ReturnPolicy></ReturnPolicy>}></Route>
 
-          <Route path='/login' element={<Login></Login>}></Route>
+          <Route path='/login' element={<LoginNewUpdated></LoginNewUpdated>}></Route>
           {/* <Route path='/signup' element={<Register></Register>}></Route> */}
-          <Route path='/signup' element={<RegisterNew></RegisterNew>}></Route>
-          <Route path='/completeInfo' element={<CompleteRegisterForPhone></CompleteRegisterForPhone>}></Route>
-          <Route path='/completeInfoPhone' element={<CompleteRegisterForEmail></CompleteRegisterForEmail>}></Route>
+          <Route path='/signup' element={<RegisterNewUpdated></RegisterNewUpdated>}></Route>
+          <Route path='/giveUserName' element={<GiveName></GiveName>}></Route>
+          {/* <Route path='/completeInfo' element={<CompleteRegisterForPhone></CompleteRegisterForPhone>}></Route>
+          <Route path='/completeInfoPhone' element={<CompleteRegisterForEmail></CompleteRegisterForEmail>}></Route> */}
 
           <Route path='/dashboard' element={<Dashboard></Dashboard>}>
             <Route index element={<PersonalInfo></PersonalInfo>}></Route>

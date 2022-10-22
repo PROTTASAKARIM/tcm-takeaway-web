@@ -1,8 +1,9 @@
 import { linkWithCredential, linkWithPhoneNumber, PhoneAuthProvider, RecaptchaVerifier } from 'firebase/auth';
-import React from 'react';
+import React, { useState } from 'react';
 import { useUpdateProfile } from 'react-firebase-hooks/auth';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import auth from '../../firebase.init';
 
 const CompleteRegisterForEmail = () => {
@@ -10,6 +11,9 @@ const CompleteRegisterForEmail = () => {
     const { register, formState: { errors }, handleSubmit } = useForm();
     const [updateProfile, updating, updateError] = useUpdateProfile(auth);
     const navigate = useNavigate();
+
+    const [otpField, setOtpField] = useState(false);
+    const [otp, setOtp] = useState("")
 
     const generateRecapture = () => {
         window.recaptchaVerifier = new RecaptchaVerifier('phone-sign-in', {
@@ -21,17 +25,22 @@ const CompleteRegisterForEmail = () => {
         }, auth);
     }
 
+
+
     const onSubmit = async data => {
 
 
         generateRecapture();
         console.log(data)
         const phoneNumberWithCode = "+880" + data.phoneNumber
-        await updateProfile({ displayName: data.name, phoneNumber: "+8801687142825", photoURL: "photo url dite hobe" });
-        // const credential = PhoneAuthProvider.credential(data.phoneNumber, data.password);
-
+        await updateProfile({ displayName: data.name, phoneNumber: phoneNumberWithCode, photoURL: "photo url dite hobe na" });
         const appVerifier = window.recaptchaVerifier;
-        return linkWithPhoneNumber(phoneNumberWithCode, appVerifier)
+
+
+        const credential = PhoneAuthProvider.credential(data.phoneNumber, appVerifier);
+        setOtpField(true)
+        // const appVerifier = window.recaptchaVerifier;
+        return linkWithPhoneNumber(auth.currentUser, credential)
             .then((confirmationResult) => {
                 // SMS sent. Prompt user to type the code from the message, then sign the
                 // user in with confirmationResult.confirm(code).
@@ -43,11 +52,28 @@ const CompleteRegisterForEmail = () => {
                 // ...
             });
 
-
-        navigate('/')
-
     }
-
+    const varifyOTP = (e) => {
+        console.log(e)
+        let otpValue = e?.target.value;
+        console.log(otpValue)
+        setOtp(otpValue)
+        if (otpValue?.length === 6) {
+            let confirmationResult = window.confirmationResult;
+            confirmationResult.confirm(otpValue).then((result) => {
+                // User signed in successfully.
+                const user = result.user;
+                console.log(user)
+                navigate('/completeInfo')
+                toast('Account Creation is Successful')
+                // ...
+            }).catch((error) => {
+                // User couldn't sign in (bad verification code?)
+                // ...
+            });
+        }
+        navigate('/')
+    }
     return (
         <div className='flex lg:h-screen justify-center items-center'>
             <div className="card w-96 bg-base-100 shadow-xl">
@@ -94,7 +120,9 @@ const CompleteRegisterForEmail = () => {
                                 {errors.phoneNumber?.type === 'required' && <span className="label-text-alt text-red-500">{errors.phoneNumber.message}</span>}
                             </label>
                         </div>
-                        {/* <div className="form-control w-full max-w-xs">
+
+
+                        <div className="form-control w-full max-w-xs">
                             <label className="label">
                                 <span className="label-text">Password</span>
                             </label>
@@ -117,7 +145,16 @@ const CompleteRegisterForEmail = () => {
                                 {errors.password?.type === 'required' && <span className="label-text-alt text-red-500">{errors.password.message}</span>}
                                 {errors.password?.type === 'minLength' && <span className="label-text-alt text-red-500">{errors.password.message}</span>}
                             </label>
-                        </div> */}
+                        </div>
+
+                        {
+                            otpField && <>
+                                <label className="label">
+                                    <span className="label-text">OTP</span>
+                                </label>
+                                <input type="number" className="input input-bordered w-full max-w-xs text-black mb-4" onChange={varifyOTP} />
+                            </>
+                        }
 
                         <input className='btn w-full max-w-xs text-white' type="submit" value="Submit" />
                     </form>

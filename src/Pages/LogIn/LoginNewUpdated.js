@@ -1,55 +1,15 @@
+import { RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Link, useNavigate } from "react-router-dom";
-import { useSignInWithEmailAndPassword, useSignInWithFacebook, useSignInWithGoogle } from 'react-firebase-hooks/auth';
-import auth from '../../firebase.init';
-import { RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
+import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import auth from '../../firebase.init';
 
-const Login = () => {
+const LoginNewUpdated = () => {
     const { register, formState: { errors }, handleSubmit } = useForm();
     const navigate = useNavigate();
     const [otpField, setOtpField] = useState(false);
     const [otp, setOtp] = useState("")
-
-
-    const [signInWithEmailAndPassword, user, loading, error] = useSignInWithEmailAndPassword(auth);
-
-    const [signInWithGoogle, gUser, gLoading, gError] = useSignInWithGoogle(auth);
-    const [signInWithFacebook, fuser, floading, ferror] = useSignInWithFacebook(auth);
-
-    const onSubmit = data => {
-        console.log(data)
-        const isNumber = /^\d/.test(data?.address);
-
-        if (isNumber) {
-            callingSignInWithPhoneNumber(data)
-        } else {
-            callingSignInWithEmailAddress(data)
-        }
-
-
-    }
-    const callingSignInWithEmailAddress = async data => {
-
-        const isEmail = /[a-z0-9]+@[a-z]+\.[a-z]{2,3}/.test(data.address);
-        const email = data.address
-
-        if (isEmail) {
-            await signInWithEmailAndPassword(email, data.password);
-            // navigate('/completeInfoPhone')
-
-        }
-        else {
-            window.alert("Give valid Email Address")
-        }    // console.log(isEmail)
-
-    }
-
-    const callingSignInWithPhoneNumber = async data => {
-        signInWithPhone(data)
-        setOtpField(true)
-    }
     const generateRecapture = () => {
         window.recaptchaVerifier = new RecaptchaVerifier('phone-sign-in', {
             'size': 'invisible',
@@ -63,7 +23,7 @@ const Login = () => {
     const signInWithPhone = (data) => {
         console.log(data)
         generateRecapture();
-        const phoneNumber = "+88" + data.address;
+        const phoneNumber = "+88" + data.phone;
         console.log(phoneNumber)
         const appVerifier = window.recaptchaVerifier;
         signInWithPhoneNumber(auth, phoneNumber, appVerifier)
@@ -79,6 +39,7 @@ const Login = () => {
             });
 
     }
+
     const varifyOTP = (e) => {
         console.log(e)
         let otpValue = e?.target.value;
@@ -90,7 +51,8 @@ const Login = () => {
                 // User signed in successfully.
                 const user = result.user;
                 console.log(user)
-                toast('Log In Successful')
+                toast.success('Log In Successful')
+                navigate('/giveUserName')
                 // ...
             }).catch((error) => {
                 // User couldn't sign in (bad verification code?)
@@ -99,21 +61,23 @@ const Login = () => {
         }
     }
 
+    const onSubmit = data => {
+        console.log(data)
+        const isNumber = /^\d/.test(data?.phone);
 
-    // console.log(gUser)
-
-    if (user || gUser || fuser) {
-
-        navigate('/')
+        if (isNumber) {
+            callingSignInWithPhoneNumber(data)
+        } else {
+            toast.error("Give Valid Phone Number")
+        }
     }
-
-    let signInError;
-    if (error || gError || ferror) {
-        signInError = <p className='text-red-500'><small>{error?.message || gError?.message}</small></p>
+    const callingSignInWithPhoneNumber = async data => {
+        signInWithPhone(data)
+        setOtpField(true)
     }
 
     return (
-        <div className='flex lg:h-screen justify-center items-center'>
+        <div className='flex justify-center items-center'>
             <div className="card w-96 bg-base-100 shadow-xl">
                 <div className="card-body">
                     <h2 className="text-center text-2xl font-bold">Login</h2>
@@ -121,16 +85,16 @@ const Login = () => {
 
                         <div className="form-control w-full max-w-xs">
                             <label className="label">
-                                <span className="label-text">Email/Phone No</span>
+                                <span className="label-text">Phone No</span>
                             </label>
                             <input
                                 type="text"
-                                placeholder="Your Email/Phone Number"
+                                placeholder="Your Phone Number"
                                 className="input input-bordered w-full max-w-xs text-black"
-                                {...register("address", {
+                                {...register("phone", {
                                     required: {
                                         value: true,
-                                        message: 'Email/Phone number is Required'
+                                        message: 'Phone number is Required'
                                     }
                                 })}
                             />
@@ -174,17 +138,9 @@ const Login = () => {
 
                         <input className='btn w-full max-w-xs text-white' type="submit" value="Login" />
                     </form>
-                    <p><small>New to TCM ? <Link className='text-accent' to="/signup">Create New Account</Link></small></p>
                     <div className="divider">OR</div>
-                    {signInError}
-                    <button
-                        onClick={() => signInWithGoogle()}
-                        className="btn btn-outline"
-                    >Continue with Google</button>
-                    <button
-                        onClick={() => signInWithFacebook()}
-                        className="btn btn-outline"
-                    >Continue with Facebook</button>
+                    <p><small>New to TCM ? <Link className='text-accent' to="/signup">Create New Account</Link></small></p>
+
                 </div>
                 <div id='phone-sign-in'></div>
             </div>
@@ -192,4 +148,4 @@ const Login = () => {
     );
 };
 
-export default Login;
+export default LoginNewUpdated;

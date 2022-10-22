@@ -1,17 +1,35 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link } from 'react-router-dom';
+import auth from '../../firebase.init';
+import { useAuthState } from 'react-firebase-hooks/auth';
 
 const UpdatePersonalInfo = () => {
     const { register, formState: { errors }, handleSubmit } = useForm();
+    const [customer, setCustomer] = useState('')
+    const [user] = useAuthState(auth);
+
+    // const phone = user.phoneNumber;
+    // const email = user.email;
+    console.log(user?.email)
+
+    // const url = `https://pos-api-v1.herokuapp.com/api/customer/email/${email}`
+    const url = ``
+    useEffect(() => {
+        fetch(url)
+            .then((res) => res.json())
+            .then((data) => setCustomer(data));
+    }, []);
 
     const onSubmit = data => {
+
+
 
     }
 
     return (
-        <div>
-            <div className='flex lg:h-screen lg:justify-center lg:items-center'>
+        <div className='h-auto'>
+            <div className='flex h-auto justify-center items-center'>
                 <div className="card lg:w-1/2 bg-base-100 shadow-xl sm:w-96">
                     <div className="card-body">
                         <h2 className="text-center text-2xl font-bold">Enter Your Personal info</h2>

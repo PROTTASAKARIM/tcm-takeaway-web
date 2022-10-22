@@ -6,9 +6,11 @@ import { toast } from 'react-toastify';
 import auth from '../../firebase.init';
 import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 import { useState } from 'react';
+import axios from 'axios';
+import CreateCustomer from '../Order/CreateCustomer';
 
 const RegisterNew = () => {
-    const { register, formState: { errors }, handleSubmit } = useForm();
+    const { register, formState: { errors }, handleSubmit, reset } = useForm();
     const navigate = useNavigate();
     const [otpField, setOtpField] = useState(false);
     const [otp, setOtp] = useState("")
@@ -52,7 +54,7 @@ const RegisterNew = () => {
         error,
     ] = useCreateUserWithEmailAndPassword(auth);
     const [signInWithGoogle, gUser, gLoading, gError] = useSignInWithGoogle(auth);
-    const [signInWithFacebook, fuser, floading, ferror] = useSignInWithFacebook(auth);
+    const [signInWithFacebook, fUser, floading, fError] = useSignInWithFacebook(auth);
     const [updateProfile, updating, updateError] = useUpdateProfile(auth);
 
     const [sendEmailVerification, sending, verror] = useSendEmailVerification(
@@ -83,6 +85,7 @@ const RegisterNew = () => {
         // await createUserWithEmailAndPassword(data.email, data.password);
         // toast('Account Create Successful')
 
+
     }
 
     const callingSignInWithPhoneNumber = (data) => {
@@ -98,7 +101,7 @@ const RegisterNew = () => {
         if (isEmail) {
             console.log(data)
             await createUserWithEmailAndPassword(email, data.password)
-            navigate('/completeInfoPhone')
+            // navigate('/completeInfoPhone')
 
             toast('Account Create Successful')
         }
@@ -122,8 +125,12 @@ const RegisterNew = () => {
                 // User signed in successfully.
                 const user = result.user;
                 console.log(user)
-                navigate('/completeInfo')
+                // navigate('/completeInfo')
                 toast('Account Creation is Successful')
+
+                { <CreateCustomer></CreateCustomer> }
+
+
                 // ...
             }).catch((error) => {
                 // User couldn't sign in (bad verification code?)
@@ -133,17 +140,19 @@ const RegisterNew = () => {
     }
 
 
-    if (user || gUser || fuser) {
+    if (user || gUser || fUser) {
 
         //  TODO:: registration successful hole oi user diye pos a ekta customer create korbo. SMS confirmation. Name email, phone , 
-        // 
+
+
+        { <CreateCustomer></CreateCustomer> }
 
         navigate('/')
     }
 
 
     let signInError;
-    if (error || gError || ferror || verror) {
+    if (error || gError || fError || verror) {
         signInError = <p className='text-red-500'><small>{error?.message || gError?.message}</small></p>
     }
     return (
